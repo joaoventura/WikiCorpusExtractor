@@ -3,7 +3,8 @@ WikiCorpusExtractor is a python library for creating corpora from Wikipedia XML 
 The output of this library is a text file of the form:
 
     <doc id="xx" title="Autism">
-    Text which is tokenized , i.e., words and punctuation are separated by a space . Some special words like step-by-step or U.S.A. are correctly handled .
+    Text which is tokenized , i.e., words and punctuation are separated by a space .
+    Some special words like step-by-step or U.S.A. are correctly handled .
     </doc>
     <doc id="xxx" title="zzz">
     ...
@@ -22,28 +23,25 @@ DOWNLOAD XML DUMP FILE
 
 CREATE A CORPUS FROM THE XML DUMP FILE (Python example)
 
-from wikiXMLDump import WikiXMLDumpFile
+    from wikiXMLDump import WikiXMLDumpFile
 
-#======== MAIN ==========
-if __name__ == "__main__":
+    if __name__ == "__main__":
 
-    # Sources
-    enSource = 'Resources/sources/EN_Medicine_depth2.xml.bz2'
+        # Sources
+        enSource = 'Resources/sources/EN_Medicine_depth2.xml.bz2'
     
-    # Create object
-    wk = WikiXMLDumpFile(enSource)
-    # Show a document
-    wkDoc = wk.getWikiDocumentByTitle('Abortion')
-    print wkDoc
-    # Print portuguese translation of the title (if available)
-    print wkDoc.getTranslatedTitle('pt')
-    # Clean wikipedia markup and tokenize the text
-    wkDoc.cleanText()
-    wkDoc.tokenizeText()
-    print wkDoc
-    # Create a corpus of about 4M words and a minimum of about 500 words per document
-    wk.createCorpus(filename='Resources/corpora/EN_Medicin_corpora.txt', minWordsByDoc=500, maxWords=4000000)
-
-
+        # Create object
+        wk = WikiXMLDumpFile(enSource)
+        # Show a document
+        wkDoc = wk.getWikiDocumentByTitle('Abortion')
+        print wkDoc
+        # Print portuguese translation of the title (if available)
+        print wkDoc.getTranslatedTitle('pt')
+        # Clean wikipedia markup and tokenize the text
+        wkDoc.cleanText()
+        wkDoc.tokenizeText()
+        print wkDoc
+        # Create a corpus of about 4M words and a minimum of about 500 words per document
+        wk.createCorpus(filename='Resources/corpora/EN_Medicin_corpora.txt', minWordsByDoc=500, maxWords=4000000)
 
 Enjoy! :)
