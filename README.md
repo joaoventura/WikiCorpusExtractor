@@ -1,29 +1,13 @@
-# =============================================================================
-#  Copyright (c) 2013. João Ventura (joaojonesventura@gmail.com).
-# ==============================================================================
-#  WikiCorpusExtractor is free software; you can redistribute it and/or modify it
-#  under the terms of the GNU General Public License, version 3,
-#  as published by the Free Software Foundation.
-#
-#  WikiCorpusExtractor is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# =============================================================================
-
 WikiCorpusExtractor is a python library for creating corpora from Wikipedia XML dump files. The target audience are people which need a collection of texts for Language Processing tools.
 
 The output of this library is a text file of the form:
 
-<doc id="xx" title="Autism">
-Text which is tokenized , i.e., words and punctuation are separated by a space . Some special words like step-by-step or U.S.A. are correctly handled .
-</doc>
-<doc id="xxx" title="zzz">
-...
-</doc>
+    <doc id="xx" title="Autism">
+    Text which is tokenized , i.e., words and punctuation are separated by a space . Some special words like step-by-step or U.S.A. are correctly handled .
+    </doc>
+    <doc id="xxx" title="zzz">
+    ...
+    </doc>
 
 
 Usage for building an English corpus (search in the other Wikipedias for other languages)
