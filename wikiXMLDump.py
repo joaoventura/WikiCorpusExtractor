@@ -127,8 +127,8 @@ class WikiXMLDumpFile(object):
         print ("Estimated %s documents with a total of %s words" % (len(titles), estimatedNumWords))
         return titles
         
-    # Creates a corpus that matches some criteria for number of documents
-    def createCorpus(self, filename, minWordsByDoc=1000, maxWords=10000000):
+    # Creates a corpus that matches some criteria for number of documents and letter case
+    def createCorpus(self, filename, minWordsByDoc=1000, maxWords=10000000, forceLowerCase=False):
         startTime = datetime.now()
         # Select able documents and clean/tokenize text to a output temp file
         titles = self.selectDocuments(minWordsByDoc, maxWords)
@@ -139,7 +139,7 @@ class WikiXMLDumpFile(object):
         for wkDoc in self.getWikiDocuments():
             if (wkDoc.title in [title for (title, numWords) in titles]):
                 wkDoc.cleanText()
-                wkDoc.tokenizeText()
+                wkDoc.tokenizeText(forceLowerCase)
                 print ("%s/%s [%s, %s]" % (i, len(titles), wkDoc.title, wkDoc.numWords))
                 fout.write(wkDoc.__str__())
                 i += 1

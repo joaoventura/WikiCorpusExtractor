@@ -42,6 +42,7 @@ CREATE A CORPUS FROM THE XML DUMP FILE (Python example)
         wkDoc.tokenizeText()
         print wkDoc
         # Create a corpus of about 4M words and a minimum of about 500 words per document
-        wk.createCorpus(filename='Resources/corpora/EN_Medicin_corpora.txt', minWordsByDoc=500, maxWords=4000000)
+        wk.createCorpus(filename='Resources/corpora/EN_Medicin_corpora.txt', 
+                        minWordsByDoc=500, maxWords=4000000, forceLowerCase=False)
 
 Enjoy! :)
