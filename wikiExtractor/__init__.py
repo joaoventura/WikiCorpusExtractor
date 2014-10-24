@@ -6,7 +6,7 @@
 #  Author: João Ventura (joaojonesventura@gmail.com)
 #
 # =============================================================================
-#  Copyright (c) 2013. João Ventura (joaojonesventura@gmail.com).
+#  Copyright (c) 2014. João Ventura (joaojonesventura@gmail.com).
 # ==============================================================================
 #  This file is part of WikiCorpusExtractor.
 #
@@ -25,10 +25,11 @@
 
 from wikiExtractor.wikiExtractor15 import WikiExtractor
 from wikiExtractor import wikiExtractor22
+from wikiExtractor import wikiExtractor26
 
 
 # Use WikiExtractor version
-WIKIEXTRACTOR_VERSION = "1.5"
+WIKIEXTRACTOR_VERSION = "2.6"
 
 # Represents an empty class
 class fakeDoc():
@@ -46,5 +47,9 @@ def cleanText(text):
     elif (WIKIEXTRACTOR_VERSION == "2.2"):
         text = wikiExtractor22.clean(text)
         text = '\n'.join(wikiExtractor22.compact(text))
+        return text
+    elif (WIKIEXTRACTOR_VERSION == "2.6"):
+        text = wikiExtractor26.clean(text)
+        text = '\n'.join(wikiExtractor26.compact(text))
         return text
     return None

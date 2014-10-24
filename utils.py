@@ -6,7 +6,7 @@
 #  Author: João Ventura (joaojonesventura@gmail.com)
 #
 # =============================================================================
-#  Copyright (c) 2013. João Ventura (joaojonesventura@gmail.com).
+#  Copyright (c) 2014. João Ventura (joaojonesventura@gmail.com).
 # ==============================================================================
 #  This file is part of WikiCorpusExtractor.
 #

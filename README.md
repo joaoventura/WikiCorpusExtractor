@@ -29,7 +29,7 @@ CREATE A CORPUS FROM THE XML DUMP FILE (Python example)
 
         # Sources
         enSource = 'Resources/sources/EN_Medicine_depth2.xml.bz2'
-    
+
         # Create object
         wk = WikiXMLDumpFile(enSource)
         # Show a document
@@ -39,10 +39,10 @@ CREATE A CORPUS FROM THE XML DUMP FILE (Python example)
         print wkDoc.getTranslatedTitle('pt')
         # Clean wikipedia markup and tokenize the text
         wkDoc.cleanText()
-        wkDoc.tokenizeText()
+        wkDoc.tokenizeText(forceLowerCase=True)  # True makes all words lowercase
         print wkDoc
         # Create a corpus of about 4M words and a minimum of about 500 words per document
-        wk.createCorpus(filename='Resources/corpora/EN_Medicin_corpora.txt', 
+        wk.createCorpus(filename='Resources/corpora/EN_Medicin_corpora.txt',
                         minWordsByDoc=500, maxWords=4000000, forceLowerCase=False)
 
 Enjoy! :)

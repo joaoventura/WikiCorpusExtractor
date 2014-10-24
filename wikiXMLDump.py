@@ -6,7 +6,7 @@
 #  Author: João Ventura (joaojonesventura@gmail.com)
 #
 # =============================================================================
-#  Copyright (c) 2013. João Ventura (joaojonesventura@gmail.com).
+#  Copyright (c) 2014. João Ventura (joaojonesventura@gmail.com).
 # ==============================================================================
 #  This file is part of WikiCorpusExtractor.
 #
@@ -69,7 +69,7 @@ class WikiXMLDumpFile(object):
             elif (line.startswith('<id>') and line.endswith('</id>') and revisionTag is False):
                 id = int(line[4:-5])
             elif (line.startswith('</page>')):
-                yield (title, id, currText)
+                yield (title, id, currText.decode(self.default_encoding))
             elif (line.startswith('<text')):
                 # Clean and start appending the text
                 currText = ""

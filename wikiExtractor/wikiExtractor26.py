@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # =============================================================================
-#  Version: 2.2 (December 30, 2012)
+#  Version: 2.6 (Oct 14, 2013)
 #  Author: Giuseppe Attardi (attardi@di.unipi.it), University of Pisa
 #	   Antonio Fuschetto (fuschett@di.unipi.it), University of Pisa
 #
@@ -10,6 +10,8 @@
 #	Leonardo Souza (lsouza@amtera.com.br)
 #	Juan Manuel Caicedo (juan@cavorite.com)
 #	Humberto Pereira (begini@gmail.com)
+#	Siegfried-A. Gevatter (siegfried@gevatter.com)
+#	Pedro Assis (pedroh2306@gmail.com)
 #
 # =============================================================================
 #  Copyright (c) 2009. Giuseppe Attardi (attardi@di.unipi.it).
@@ -28,9 +30,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # =============================================================================
-
-# Modifications by João Ventura <joaojonesventura@gmail.com>
-# Line: 149 - Ignore <text>, <pre> and <ref> tags from text content
 
 """Wikipedia Extractor:
 Extracts and cleans text from Wikipedia database dump and stores output in a
@@ -66,10 +65,11 @@ from htmlentitydefs import name2codepoint
 
 ### PARAMS ####################################################################
 
-prefix = 'http://it.wikipedia.org/wiki/'
+# This is obtained from the dump itself
+prefix = None
 
 ##
-# Whether to preserve links in output
+# Whether to preseve links in output
 #
 keepLinks = False
 
@@ -81,8 +81,10 @@ keepSections = False
 ##
 # Recognize only these namespaces
 # w: Internal links to the Wikipedia
+# wiktionary: Wiki dictionry
+# wikt: shortcut for Wikctionry
 #
-acceptedNamespaces = set(['w'])
+acceptedNamespaces = set(['w', 'wiktionary', 'wikt'])
 
 ##
 # Drop these elements from article text
@@ -110,14 +112,13 @@ discardElements = set([
 #=========================================================================== 
 
 # Program version
-version = '2.2'
-
+version = '2.5'
 
 ##### Main function ###########################################################
 
 def WikiDocument(out, id, title, text):
     url = get_url(id, prefix)
-    header = '<doc id="%s" url="%s" title="%s">' % (id, url, title)
+    header = '<doc id="%s" url="%s" title="%s">\n' % (id, url, title)
     # Separate header from text with a newline.
     header += title + '\n'
     header = header.encode('utf-8')
@@ -132,22 +133,17 @@ def WikiDocument(out, id, title, text):
 def get_url(id, prefix):
     return "%s?curid=%s" % (prefix, id)
 
-# This version tries to guess the URL from the title
-# def guess_url(title, prefix):
-#     title = urllib.quote(title.replace(' ', '_').encode('utf-8'))
-#     title = title.replace('%28', '(').replace('%29', ')')
-#     return prefix + title.capitalize()
-
 #------------------------------------------------------------------------------
 
-selfClosingTags = set([ 'br', 'hr', 'nobr', 'ref', 'references' ])
+selfClosingTags = [ 'br', 'hr', 'nobr', 'ref', 'references' ]
 
-ignoredTags = set([
-        'a', 'b', 'big', 'blockquote', 'center', 'cite', 'div', 'em',
+# handle 'a' separetely, depending on keepLinks
+ignoredTags = [
+        'b', 'big', 'blockquote', 'center', 'cite', 'div', 'em',
         'font', 'h1', 'h2', 'h3', 'h4', 'hiero', 'i', 'kbd', 'nowiki',
         'p', 'plaintext', 's', 'small', 'span', 'strike', 'strong',
-        'sub', 'sup', 'tt', 'u', 'var', 'text', 'pre', 'ref',
-])
+        'sub', 'sup', 'tt', 'u', 'var',
+]
 
 placeholder_tags = {'math':'formula', 'code':'codice'}
 
@@ -218,26 +214,29 @@ comment = re.compile(r'<!--.*?-->', re.DOTALL)
 # Match elements to ignore
 discard_element_patterns = []
 for tag in discardElements:
-    pattern = re.compile(r'<%s[^>]*>.*?</%s>' % (tag, tag), re.DOTALL | re.IGNORECASE)
+    pattern = re.compile(r'<\s*%s\b[^>]*>.*?<\s*/\s*%s>' % (tag, tag), re.DOTALL | re.IGNORECASE)
     discard_element_patterns.append(pattern)
 
 # Match ignored tags
 ignored_tag_patterns = []
-for tag in ignoredTags:
-    left = re.compile(r'<%s[^/]*>' % tag, re.IGNORECASE)
-    right = re.compile(r'</%s>' % tag, re.IGNORECASE)
+def ignoreTag(tag):
+    left = re.compile(r'<\s*%s\b[^>]*>' % tag, re.IGNORECASE)
+    right = re.compile(r'<\s*/\s*%s>' % tag, re.IGNORECASE)
     ignored_tag_patterns.append((left, right))
+
+for tag in ignoredTags:
+    ignoreTag(tag)
 
 # Match selfClosing HTML tags
 selfClosing_tag_patterns = []
 for tag in selfClosingTags:
-    pattern = re.compile(r'<%s[^/]*/\s*>' % tag, re.DOTALL | re.IGNORECASE)
+    pattern = re.compile(r'<\s*%s\b[^/]*/\s*>' % tag, re.DOTALL | re.IGNORECASE)
     selfClosing_tag_patterns.append(pattern)
 
 # Match HTML placeholder tags
 placeholder_tag_patterns = []
 for tag, repl in placeholder_tags.items():
-    pattern = re.compile(r'<\s*%s(\s*| [^/]+?)>.*?<\s*/\s*%s\s*>' % (tag, tag), re.DOTALL | re.IGNORECASE)
+    pattern = re.compile(r'<\s*%s(\s*| [^>]+?)>.*?<\s*/\s*%s\s*>' % (tag, tag), re.DOTALL | re.IGNORECASE)
     placeholder_tag_patterns.append((pattern, repl))
 
 # Match preformatted lines
@@ -365,9 +364,6 @@ def clean(text):
     # Drop tables
     text = dropNested(text, r'{\|', r'\|}')
 
-    # Drop preformatted
-    text = preformatted.sub('', text)
-
     # Expand links
     text = wikiLink.sub(make_anchor_tag, text)
     # Drop all remaining ones
@@ -428,6 +424,12 @@ def clean(text):
 
     text = text.replace('<<', u'«').replace('>>', u'»')
 
+    #############################################
+
+    # Drop preformatted
+    # This can't be done before since it may remove tags
+    text = preformatted.sub('', text)
+
     # Cleanup text
     text = text.replace('\t', ' ')
     text = spaces.sub(' ', text)
@@ -445,7 +447,7 @@ def compact(text):
     page = []                   # list of paragraph
     headers = {}                # Headers for unfilled sections
     emptySection = False        # empty sections are discarded
-    inList = False              # wheter opened <UL>
+    inList = False              # whether opened <UL>
 
     for line in text.split('\n'):
 
@@ -475,7 +477,7 @@ def compact(text):
                     title += '.'
                 page.append(title)
         # handle lists
-        elif line[-1] == ':' or line[0] in '*#:;':
+        elif line[0] in '*#:;':
             if keepSections:
                 page.append("<li>%s</li>" % line[1:])
             else:
@@ -551,9 +553,10 @@ class OutputSplitter:
 
 ### READER ###################################################################
 
-tagRE = re.compile(r'(.*?)<(/?\w+)[^>]*>(?:([^<]*)(<.*>)?)?')
+tagRE = re.compile(r'(.*?)<(/?\w+)[^>]*>(?:([^<]*)(<.*?>)?)?')
 
 def process_data(input, output):
+    global prefix
 
     page = []
     id = None
@@ -596,6 +599,11 @@ def process_data(input, output):
                 WikiDocument(output, id, title, ''.join(page))
             id = None
             page = []
+        elif tag == 'base':
+            # discover prefix from the xml dump file
+            # /mediawiki/siteinfo/base
+            base = m.group(3)
+            prefix = base[:base.rfind("/")]
 
 ### CL INTERFACE ############################################################
 
@@ -667,6 +675,9 @@ def main():
         except:
             print >> sys.stderr, 'Could not create: ', output_dir
             return
+
+    if not keepLinks:
+        ignoreTag('a')
 
     output_splitter = OutputSplitter(compress, file_size, output_dir)
     process_data(sys.stdin, output_splitter)

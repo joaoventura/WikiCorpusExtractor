@@ -6,7 +6,7 @@
 #  Author: João Ventura (joaojonesventura@gmail.com)
 #
 # =============================================================================
-#  Copyright (c) 2013. João Ventura (joaojonesventura@gmail.com).
+#  Copyright (c) 2014. João Ventura (joaojonesventura@gmail.com).
 # ==============================================================================
 #  This file is part of WikiCorpusExtractor.
 #
@@ -44,8 +44,7 @@ from utils import Utils
 class Tokenizer(object):
     "Tokenizes texts"
 
-    def __init__(self, encoding = 'UTF-8'):
-        self.default_encoding = encoding
+    def __init__(self):
         # creates regular expression patern (alfanumeric groups of characters)
         #
         # ([A-Z][\w]?\.)+ -> Uppercase, followed by 0 or 1 letter/num, followed by
@@ -66,8 +65,6 @@ class Tokenizer(object):
     # Tokenizes a line
     def tokenize_line(self, line, lowerCase=False, preserveDocTags=False):
         res = []
-        # convert line from default encoding to bytes
-        line = line.decode(self.default_encoding)
         # check if line is a <doc> or </doc> and so, return line unchanged
         if ((line.startswith("<doc") or line.startswith("</doc>")) and preserveDocTags is True):
             return line.split()
@@ -102,8 +99,8 @@ class Tokenizer(object):
         fout = Utils.get_file_handler(fileout, "w")
 
         for line in self.tokenize(fin, lowerCase, preserveDocTags):
-            # Writes to file encoded in the default encoding
-            fout.write(" ".join(line).encode(self.default_encoding))
+            # Writes to file
+            fout.write(" ".join(line))
             fout.write("\n")
 
         # closes handlers
